@@ -131,6 +131,16 @@
             @Html.TextBoxFor(model => model.StateName, new { @readonly = "readonly" })
         </div>
     </div>
+    <div class="two fields">
+        <div class="field">
+            @Html.LabelFor(model => model.PaymentState)
+            @Html.TextBoxFor(model => model.PaymentState, new { @readonly = "readonly" })
+        </div>
+        <div class="field">
+            @Html.LabelFor(model => model.PaymentAmount)
+            @Html.TextBoxFor(model => model.PaymentAmount, new { @readonly = "readonly" })
+        </div>
+    </div>
     <div class="field">
         @Html.LabelFor(model => model.Comment)
         @Html.TextAreaFor(model => model.Comment, 6, 100, new { style = "width:98%" })

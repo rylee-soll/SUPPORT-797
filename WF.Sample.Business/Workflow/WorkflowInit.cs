@@ -259,6 +259,13 @@ namespace WF.Sample.Business.Workflow
             var doc = docRepository.Get(processInstance.ProcessId);
             return doc;
         }
+
+        public static Payment GetPayment(ProcessInstance processInstance)
+        {
+            var repository = DataServiceProvider.Get<IPaymentRepository>();
+            var payment = repository.GetAsync(processInstance.ProcessId).Result;
+            return payment;
+        }
         
         public static WorkflowRuntime Runtime => _runtime;
         

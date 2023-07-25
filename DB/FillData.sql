@@ -46,14 +46,20 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
   </Actors>
   <Parameters>
     <Parameter Name="Comment" Type="String" Purpose="Temporary" />
+    <Parameter Name="NewAmount" Type="Decimal" Purpose="Persistence" />
   </Parameters>
   <Commands>
-    <Command Name="StartSigning">
+    <Command Name="Approve">
       <InputParameters>
         <ParameterRef Name="Comment" IsRequired="false" DefaultValue="" NameRef="Comment" />
       </InputParameters>
     </Command>
-    <Command Name="Approve">
+    <Command Name="Rollback">
+      <InputParameters>
+        <ParameterRef Name="Comment" IsRequired="false" DefaultValue="" NameRef="Comment" />
+      </InputParameters>
+    </Command>
+    <Command Name="Finalize">
       <InputParameters>
         <ParameterRef Name="Comment" IsRequired="false" DefaultValue="" NameRef="Comment" />
       </InputParameters>
@@ -63,9 +69,9 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
         <ParameterRef Name="Comment" IsRequired="false" DefaultValue="" NameRef="Comment" />
       </InputParameters>
     </Command>
-    <Command Name="Paid">
+    <Command Name="SetNewAmount">
       <InputParameters>
-        <ParameterRef Name="Comment" IsRequired="false" DefaultValue="" NameRef="Comment" />
+        <ParameterRef Name="NewAmount" IsRequired="false" DefaultValue="" NameRef="NewAmount" />
       </InputParameters>
     </Command>
   </Commands>
@@ -74,37 +80,68 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
   </Timers>
   <Comments>
     <Comment Name="Comment" Alignment="left" Rotation="0" Width="168" BoldText="false" ItalicText="false" UnderlineText="false" LineThroughText="false" FontSize="14" Value="↑&#xA;&#xA;This is the Activity and this is the first key object which makes up the diagram.&#xA;It specifies the order in which Actions are performed in your process.">
-      <Designer X="330" Y="290" Color="#020930" Hidden="false" />
+      <Designer X="320" Y="460" Color="#020930" Hidden="false" />
     </Comment>
-    <Comment Name="Comment" Alignment="left" Rotation="0" Width="253" BoldText="false" ItalicText="false" UnderlineText="false" LineThroughText="false" FontSize="14" Value="← This Transition is triggered by a timer.">
-      <Designer X="1020" Y="120" Color="#020930" Hidden="false" />
+    <Comment Name="Comment" Alignment="center" Rotation="0" Width="139.7236328125" BoldText="false" ItalicText="false" UnderlineText="false" LineThroughText="false" FontSize="14" Value="↑&#xA;This Transition &#xA;is triggered by a timer.">
+      <Designer X="820" Y="480" Color="#020930" Hidden="false" />
     </Comment>
     <Comment Name="Comment" Alignment="center" Rotation="0" Width="157" BoldText="false" ItalicText="false" UnderlineText="false" LineThroughText="false" FontSize="14" Value=" This Transition is &#xA;triggered by a command &#xA;with condition&#xA;↓">
-      <Designer X="820" Y="160" Color="#020930" Hidden="false" />
+      <Designer X="810" Y="300" Color="#020930" Hidden="false" />
     </Comment>
     <Comment Name="Comment" Alignment="right" Rotation="0" Width="271" BoldText="false" ItalicText="false" UnderlineText="false" LineThroughText="false" FontSize="14" Value="This is the Transition and this is the second key object a scheme comprises.&#xA;Transition always connects two Activities together, and controls the sequence of execution of your processes.&#xA;&#xA;↓">
-      <Designer X="330" Y="110" Color="#020930" Hidden="false" />
+      <Designer X="320" Y="280" Color="#020930" Hidden="false" />
+    </Comment>
+    <Comment Name="Comment_1" Alignment="center" Rotation="0" Width="121.0615234375" BoldText="false" ItalicText="false" UnderlineText="false" LineThroughText="false" FontSize="14" Value=" This Transition is &#xA;triggered otherwise&#xA;↓">
+      <Designer X="620" Y="150" Color="#020930" Hidden="false" />
     </Comment>
   </Comments>
   <Activities>
     <Activity Name="VacationRequestCreated" State="VacationRequestCreated" IsInitial="true" IsFinal="false" IsForSetState="true" IsAutoSchemeUpdate="true">
-      <Designer X="320" Y="220" Color="#27AE60" Hidden="false" />
+      <Designer X="310" Y="390" Color="#27AE60" Hidden="false" />
     </Activity>
     <Activity Name="ManagerSigning" State="ManagerSigning" IsInitial="false" IsFinal="false" IsForSetState="true" IsAutoSchemeUpdate="true">
-      <Designer X="660" Y="220" Hidden="false" />
+      <Implementation>
+        <ActionRef Order="1" NameRef="CreatePayment">
+          <ActionParameter><![CDATA[@Sum]]></ActionParameter>
+        </ActionRef>
+      </Implementation>
+      <Designer X="650" Y="390" Hidden="false" />
     </Activity>
     <Activity Name="BigBossSigning" State="BigBossSigning" IsInitial="false" IsFinal="false" IsForSetState="true" IsAutoSchemeUpdate="true">
-      <Designer X="1000" Y="220" Hidden="false" />
+      <Designer X="990" Y="390" Hidden="false" />
     </Activity>
     <Activity Name="AccountingReview" State="AccountingReview" IsInitial="false" IsFinal="false" IsForSetState="true" IsAutoSchemeUpdate="true">
-      <Designer X="1000" Y="380" Hidden="false" />
+      <Designer X="990" Y="210" Hidden="false" />
     </Activity>
     <Activity Name="RequestApproved" State="RequestApproved" IsInitial="false" IsFinal="true" IsForSetState="true" IsAutoSchemeUpdate="true">
-      <Designer X="1280" Y="380" Hidden="false" />
+      <Implementation>
+        <ActionRef Order="1" NameRef="PayPayment" />
+      </Implementation>
+      <Designer X="1330" Y="210" Hidden="false" />
+    </Activity>
+    <Activity Name="Canceled" State="Canceled" IsInitial="false" IsFinal="true" IsForSetState="true" IsAutoSchemeUpdate="true">
+      <Implementation>
+        <ActionRef Order="1" NameRef="CancelPayment" />
+      </Implementation>
+      <Designer X="1320" Y="540" Hidden="false" />
+    </Activity>
+    <Activity Name="BigBoss rejection" State="BigBoss rejection" IsInitial="false" IsFinal="false" IsForSetState="true" IsAutoSchemeUpdate="true">
+      <Designer X="990" Y="540" Hidden="false" />
+    </Activity>
+    <Activity Name="Requester signing" State="Requester signing" IsInitial="false" IsFinal="false" IsForSetState="true" IsAutoSchemeUpdate="true">
+      <Designer X="1260" Y="290" Hidden="false" />
+    </Activity>
+    <Activity Name="Setting new amount" State="Setting new amount" IsInitial="false" IsFinal="false" IsForSetState="false" IsAutoSchemeUpdate="true">
+      <Implementation>
+        <ActionRef Order="1" NameRef="SetNewPaymentAmount">
+          <ActionParameter><![CDATA[@NewAmount]]></ActionParameter>
+        </ActionRef>
+      </Implementation>
+      <Designer X="1260" Y="400" Hidden="false" />
     </Activity>
   </Activities>
   <Transitions>
-    <Transition Name="ManagerSigning_Draft_1" To="VacationRequestCreated" From="ManagerSigning" Classifier="Reverse" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+    <Transition Name="ManagerSigning_Draft_1" To="BigBoss rejection" From="ManagerSigning" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
       <Restrictions>
         <Restriction Type="Allow" NameRef="Manager" />
       </Restrictions>
@@ -114,7 +151,7 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
       <Conditions>
         <Condition Type="Always" />
       </Conditions>
-      <Designer X="575" Y="236" Hidden="false" />
+      <Designer X="677" Y="581" Hidden="false" />
     </Transition>
     <Transition Name="BigBossSigning_Activity_1_1" To="AccountingReview" From="BigBossSigning" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
       <Restrictions>
@@ -126,7 +163,7 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
       <Conditions>
         <Condition Type="Always" />
       </Conditions>
-      <Designer Hidden="false" />
+      <Designer X="1015" Y="355" Hidden="false" />
     </Transition>
     <Transition Name="ManagerSigning_Approved_1" To="AccountingReview" From="ManagerSigning" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
       <Restrictions>
@@ -138,7 +175,7 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
       <Conditions>
         <Condition Type="Otherwise" />
       </Conditions>
-      <Designer X="761" Y="334" Hidden="false" />
+      <Designer X="677" Y="226" Hidden="false" />
     </Transition>
     <Transition Name="ManagerSigning_BigBossSigning_1" To="BigBossSigning" From="ManagerSigning" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
       <Restrictions>
@@ -148,35 +185,35 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
         <Trigger Type="Command" NameRef="Approve" />
       </Triggers>
       <Conditions>
-        <Condition Type="Expression" ConditionInversion="false">
-          <Expression><![CDATA[@Sum > 100]]></Expression>
+        <Condition Type="Action" NameRef="CheckAmountMoreThen" ConditionInversion="false">
+          <ActionParameter><![CDATA[1000]]></ActionParameter>
         </Condition>
       </Conditions>
-      <Designer X="905" Y="238" Hidden="false" />
+      <Designer X="887" Y="384" Hidden="false" />
     </Transition>
     <Transition Name="Draft_ManagerSigning_1" To="ManagerSigning" From="VacationRequestCreated" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
       <Restrictions>
         <Restriction Type="Allow" NameRef="Author" />
       </Restrictions>
       <Triggers>
-        <Trigger Type="Command" NameRef="StartSigning" />
+        <Trigger Type="Command" NameRef="Approve" />
       </Triggers>
       <Conditions>
         <Condition Type="Always" />
       </Conditions>
-      <Designer X="572" Y="268" Hidden="false" />
+      <Designer X="560" Y="436" Hidden="false" />
     </Transition>
     <Transition Name="BigBossSigning_ManagerSigning_1" To="ManagerSigning" From="BigBossSigning" Classifier="Reverse" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
       <Restrictions>
         <Restriction Type="Allow" NameRef="BigBoss" />
       </Restrictions>
       <Triggers>
-        <Trigger Type="Command" NameRef="Reject" />
+        <Trigger Type="Command" NameRef="Rollback" />
       </Triggers>
       <Conditions>
         <Condition Type="Always" />
       </Conditions>
-      <Designer X="902" Y="268" Hidden="false" />
+      <Designer X="888" Y="420" Hidden="false" />
     </Transition>
     <Transition Name="ManagerSigning_BigBossSigning_2" To="BigBossSigning" From="ManagerSigning" Classifier="NotSpecified" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
       <Triggers>
@@ -185,14 +222,14 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
       <Conditions>
         <Condition Type="Always" />
       </Conditions>
-      <Designer X="903" Y="122" Hidden="false" />
+      <Designer X="888" Y="455" Hidden="false" />
     </Transition>
     <Transition Name="Accountant_Activity_1_1" To="RequestApproved" From="AccountingReview" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
       <Restrictions>
         <Restriction Type="Allow" NameRef="Accountant" />
       </Restrictions>
       <Triggers>
-        <Trigger Type="Command" NameRef="Paid" />
+        <Trigger Type="Command" NameRef="Finalize" />
       </Triggers>
       <Conditions>
         <Condition Type="Always" />
@@ -204,12 +241,105 @@ EXEC(N'INSERT dbo.WorkflowScheme(Code, Scheme) VALUES (N''SimpleWF'', N''
         <Restriction Type="Allow" NameRef="Accountant" />
       </Restrictions>
       <Triggers>
+        <Trigger Type="Command" NameRef="Rollback" />
+      </Triggers>
+      <Conditions>
+        <Condition Type="Always" />
+      </Conditions>
+      <Designer X="723" Y="265" Hidden="false" />
+    </Transition>
+    <Transition Name="ManagerSigning_VacationRequestCreated_1" To="VacationRequestCreated" From="ManagerSigning" Classifier="Reverse" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+      <Restrictions>
+        <Restriction Type="Allow" NameRef="Manager" />
+      </Restrictions>
+      <Triggers>
+        <Trigger Type="Command" NameRef="Rollback" />
+      </Triggers>
+      <Conditions>
+        <Condition Type="Always" />
+      </Conditions>
+      <Designer X="561.6317901611328" Y="404" Hidden="false" />
+    </Transition>
+    <Transition Name="BigBossSigning_BigBoss rejection_1" To="BigBoss rejection" From="BigBossSigning" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+      <Restrictions>
+        <Restriction Type="Allow" NameRef="BigBoss" />
+      </Restrictions>
+      <Triggers>
         <Trigger Type="Command" NameRef="Reject" />
       </Triggers>
       <Conditions>
         <Condition Type="Always" />
       </Conditions>
-      <Designer X="702" Y="420" Hidden="false" />
+      <Designer X="1018" Y="487" Hidden="false" />
+    </Transition>
+    <Transition Name="BigBoss rejection_Canceled_1" To="Canceled" From="BigBoss rejection" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+      <Restrictions>
+        <Restriction Type="Allow" NameRef="BigBoss" />
+      </Restrictions>
+      <Triggers>
+        <Trigger Type="Command" NameRef="Finalize" />
+      </Triggers>
+      <Conditions>
+        <Condition Type="Always" />
+      </Conditions>
+      <Designer Hidden="false" />
+    </Transition>
+    <Transition Name="BigBoss rejection_ManagerSigning_1" To="ManagerSigning" From="BigBoss rejection" Classifier="Reverse" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+      <Restrictions>
+        <Restriction Type="Allow" NameRef="BigBoss" />
+      </Restrictions>
+      <Triggers>
+        <Trigger Type="Command" NameRef="Rollback" />
+      </Triggers>
+      <Conditions>
+        <Condition Type="Always" />
+      </Conditions>
+      <Designer X="722" Y="510" Hidden="false" />
+    </Transition>
+    <Transition Name="BigBossSigning_Activity_1" To="Requester signing" From="BigBossSigning" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+      <Restrictions>
+        <Restriction Type="Allow" NameRef="BigBoss" />
+      </Restrictions>
+      <Triggers>
+        <Trigger Type="Command" NameRef="SetNewAmount" />
+      </Triggers>
+      <Conditions>
+        <Condition Type="Always" />
+      </Conditions>
+      <Designer X="1081" Y="313" Hidden="false" />
+    </Transition>
+    <Transition Name="Requester signing_Activity_1" To="Setting new amount" From="Requester signing" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+      <Restrictions>
+        <Restriction Type="Allow" NameRef="Author" />
+      </Restrictions>
+      <Triggers>
+        <Trigger Type="Command" NameRef="Approve" />
+      </Triggers>
+      <Conditions>
+        <Condition Type="Always" />
+      </Conditions>
+      <Designer X="1452.5" Y="372" Hidden="false" />
+    </Transition>
+    <Transition Name="Changing_BigBossSigning_1" To="BigBossSigning" From="Setting new amount" Classifier="Direct" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+      <Triggers>
+        <Trigger Type="Auto" />
+      </Triggers>
+      <Conditions>
+        <Condition Type="Always" />
+      </Conditions>
+      <Designer Hidden="false" />
+    </Transition>
+    <Transition Name="Requester signing_BigBossSigning_1" To="BigBossSigning" From="Requester signing" Classifier="Reverse" AllowConcatenationType="And" RestrictConcatenationType="And" ConditionsConcatenationType="And" DisableParentStateControl="false">
+      <Restrictions>
+        <Restriction Type="Allow" NameRef="Author" />
+      </Restrictions>
+      <Triggers>
+        <Trigger Type="Command" NameRef="Rollback" />
+      </Triggers>
+      <Conditions>
+        <Condition Type="Always" />
+      </Conditions>
+      <Designer X="1126" Y="345" Hidden="false" />
     </Transition>
   </Transitions>
   <Localization>

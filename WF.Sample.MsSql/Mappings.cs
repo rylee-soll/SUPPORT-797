@@ -19,6 +19,8 @@ namespace WF.Sample.MsSql
                 cfg.CreateMap<EmployeeRole, Business.Model.EmployeeRole>();
 
                 cfg.CreateMap<Document, Business.Model.Document>();
+                
+                cfg.CreateMap<Payment, Business.Model.Payment>();
             });
 
             var mapper = config.CreateMapper();

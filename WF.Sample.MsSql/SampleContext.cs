@@ -15,6 +15,7 @@ namespace WF.Sample.MsSql
 
         public virtual DbSet<Document> Documents { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<StructDivision> StructDivisions { get; set; }
         public virtual DbSet<Head> VHeads { get; set; }
