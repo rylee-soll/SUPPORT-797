@@ -42,6 +42,13 @@ namespace WF.Sample.Models
         [Display(Name = "State")]
         public string StateName { get; set; }
         
+        [DataType(DataType.Text)]
+        [Display(Name = "Payment state")]
+        public string PaymentState { get; set; }
+
+        [Display(Name = "Payment Amount")]
+        public decimal PaymentAmount { get; set; }
+        
         //False - if document is not found
         public bool IsCorrect { get; set; } = true;
         

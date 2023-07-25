@@ -116,4 +116,16 @@ BEGIN
 	PRINT 'EmployeeRole CREATE TABLE'
 END
 
+IF NOT EXISTS (SELECT 1 FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = N'Payments')
+BEGIN
+    CREATE TABLE dbo.Payments (
+                                  Id uniqueidentifier NOT NULL,
+                                  State nvarchar(32) NOT NULL,
+                                  Amount money NOT NULL,
+                                  RecipientId uniqueidentifier NOT NULL
+    )
+
+    PRINT 'Payments CREATE TABLE'
+END
+
 COMMIT TRANSACTION

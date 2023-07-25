@@ -19,12 +19,14 @@ namespace WF.Sample.Controllers
     public class DocumentController : Controller
     {
         private readonly IDocumentRepository _documentRepository;
+        private readonly IPaymentRepository _paymentRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
         private int pageSize = 15;
-        public DocumentController(IDocumentRepository documentRepository, IEmployeeRepository employeeRepository, IMapper mapper)
+        public DocumentController(IDocumentRepository documentRepository, IPaymentRepository paymentRepository, IEmployeeRepository employeeRepository, IMapper mapper)
         {
             _documentRepository = documentRepository;
+            _paymentRepository = paymentRepository;
             _employeeRepository = employeeRepository;
             _mapper = mapper;
         }
@@ -88,6 +90,7 @@ namespace WF.Sample.Controllers
             if(Id.HasValue)
             {
                 var d = _documentRepository.Get(Id.Value);
+                var payment = await _paymentRepository.GetAsync(Id.Value);
                 if(d != null)
                 {
                     await CreateWorkflowIfNotExists(Id.Value);
@@ -106,6 +109,8 @@ namespace WF.Sample.Controllers
                                     Number = d.Number,
                                     StateName = d.StateName,
                                     Sum = d.Sum,
+                                    PaymentState = payment?.State.ToString() ?? "Not requested",
+                                    PaymentAmount = payment?.Amount ?? 0,
                                     Commands = await GetCommands(Id.Value),
                                     AvailiableStates = await GetStates(Id.Value),
                                     HistoryModel = new DocumentHistoryModel{Items = history}
@@ -283,6 +288,9 @@ namespace WF.Sample.Controllers
 
             if (command.Parameters.Count(p => p.ParameterName == "Comment") == 1)
                 command.Parameters.Single(p => p.ParameterName == "Comment").Value = document.Comment ?? string.Empty;
+
+            if (command.Parameters.Count(p => p.ParameterName == "NewAmount") == 1)
+                command.Parameters.Single(p => p.ParameterName == "NewAmount").Value = document.Sum;
 
             await WorkflowInit.Runtime.ExecuteCommandAsync(command,currentUser,currentUser);
         }

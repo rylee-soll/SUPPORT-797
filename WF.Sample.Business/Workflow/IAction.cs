@@ -1,0 +1,14 @@
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using OptimaJet.Workflow.Core.Model;
+using OptimaJet.Workflow.Core.Runtime;
+
+namespace WF.Sample.Business.Workflow;
+
+public interface IAction
+{
+    string Name { get; }
+    List<string> ExcludedSchemes { get; }
+    Task ExecuteAsync(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token);
+}

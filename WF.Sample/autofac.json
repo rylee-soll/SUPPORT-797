@@ -13,6 +13,14 @@
       ]
     },
     {
+      "type": "WF.Sample.MsSql.Implementation.PaymentRepository",
+      "services": [
+        {
+          "type": "WF.Sample.Business.DataAccess.IPaymentRepository, WF.Sample.Business"
+        }
+      ]
+    },
+    {
       "type": "WF.Sample.MsSql.Implementation.EmployeeRepository",
       "services": [
         {
