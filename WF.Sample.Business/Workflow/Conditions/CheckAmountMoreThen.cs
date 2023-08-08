@@ -23,7 +23,7 @@ public class CheckAmountMoreThen : ICondition
     {
         var amount = String.IsNullOrWhiteSpace(actionParameter) ? 0 : JsonConvert.DeserializeObject<int>(actionParameter);
         var payment = await _payments.GetAsync(processInstance.ProcessId);
-        return payment.Amount > amount;
+        return payment?.Amount > amount;
     }
 
     private readonly IPaymentRepository _payments;
